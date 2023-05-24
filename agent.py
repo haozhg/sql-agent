@@ -28,8 +28,8 @@ def main():
         raise Exception("You need to run export OPENAI_API_KEY=your_openai_api_key")
     
     db = SQLDatabase.from_uri(args.sqlite_uri)
-    # llm=OpenAI(temperature=0)
-    llm=ChatOpenAI(temperature=0)
+    # llm=OpenAI(temperature=0) # `text-davinci-003`, aka GPT-3
+    llm=ChatOpenAI(temperature=0) # `gpt-3.5-turbo`, aka GPT-3.5
     print(f"llm.model_name={llm.model_name}")
     toolkit = SQLDatabaseToolkit(db=db, llm=llm)
     
