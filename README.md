@@ -6,12 +6,12 @@ This repo is a fast prototype of SQL Agent based on `langchain`. References
 ### Data
 I tried to find public datasets with 400+ columns online, but given the time limit, the best I can find is [FIFA 22 complete player dataset](https://www.kaggle.com/datasets/stefanoleone992/fifa-22-complete-player-dataset?select=players_22.csv), which has 110 columns.
 
-Here are the one-time set up steps needed to generate `fifa22.db` (sqlite db file). I have already done it, so you can skip this part, I document the steps here in case you wanna to reproduce it.
+Here are the one-time set up steps needed to generate `fifa.db` (sqlite db file). I have already done it, so you can skip this part, I document the steps here in case you wanna to reproduce it.
 
 - Download data from above link
 - unzip it
-- move `archive/players_22.csv` to `fifa22.csv`
-- `pip install csv-to-sqlite` and `ls fifa22.csv | csv-to-sqlite -o fifa22.db`
+- move `archive/players_22.csv` to `fifa.csv`
+- `pip install csv-to-sqlite` and `ls fifa.csv | csv-to-sqlite -o fifa.db`
 
 ### Start SQL Agent
 ```
