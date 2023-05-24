@@ -80,10 +80,6 @@ Thought: I now know the final answer
 Final Answer: The average wage_eur in the fifa table is 8989.396538281615.
 ```
 
-Question: what's the mean and std of `age` in the `fifa` table?
-```
-
-```
 
 Question: what's the mean, std, min, 25th percentile, medium, 75th percentile and max of `age` in the fifa table?
 ```
@@ -130,7 +126,39 @@ Observation: The query is not valid for SQLite as it does not support the PERCEN
 ```
 Even after I change LLM to `GPT-3.5`, the context length issue disappears (even though the max context length of `GPT-3.5` is same as `GPT-3`), I think somehow GPT-3.5 does a better job at generating more concise prompts and SQL commands. Still I found that it produces syntax errors in SQL queries.
 
-### SQL Table with Hundreds of Columns
+Question: what's the mean and std of age in the fifa table?
+```
+> Entering new AgentExecutor chain...
+Action: list_tables_sql_db
+Action Input: ""
+Observation: fifa
+Thought:I can query the `fifa` table for the mean and std of `age`.
+Action: query_checker_sql_db
+Action Input: "SELECT AVG(age), STDEV(age) FROM fifa"
+Observation: The original query is correct and does not contain any of the common mistakes listed. Therefore, the query can be reproduced as follows:
+
+SELECT AVG(age), STDEV(age) FROM fifa
+Thought:I should execute the query to get the mean and std of `age` in the `fifa` table.
+Action: query_sql_db
+Action Input: "SELECT AVG(age), STDEV(age) FROM fifa"
+Observation: Error: (sqlite3.OperationalError) no such function: STDEV
+[SQL: SELECT AVG(age), STDEV(age) FROM fifa]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+Thought:I need to use a different function to calculate the standard deviation.
+Action: query_checker_sql_db
+Action Input: "SELECT AVG(age), CAST((SUM(age*age) - COUNT(age)*AVG(age)*AVG(age))/(COUNT(age)-1) AS FLOAT) AS std FROM fifa"
+Observation: The original query is correct and does not contain any of the common mistakes listed.
+Thought:I should execute the corrected query to get the mean and std of `age` in the `fifa` table.
+Action: query_sql_db
+Action Input: "SELECT AVG(age), CAST((SUM(age*age) - COUNT(age)*AVG(age)*AVG(age))/(COUNT(age)-1) AS FLOAT) AS std FROM fifa"
+Observation: [(25.210821768283175, 22.545737961734247)]
+Thought:I now know the final answer.
+Final Answer: The mean age in the `fifa` table is approximately 25.21 and the standard deviation is approximately 22.55.
+```
+The first SQL query failed but the model was able to correct itself after re-try, which is amazing!
+
+
+### Improve SQL Agent for Tables with Hundreds of Columns
 Challenges
 - LLM context length limit issue for SQL table with many columns (prompt too long)
 - When the agent needs to query multiple columns to answer a question, it can make SQL syntax mistakes and lose track of context
@@ -140,3 +168,5 @@ Improvements
 - Use LLM with larger context length. e.g, `GPT-4` can handle 25k tokens, and `Claude` can handle 100k tokens (just released in early May 2023)
 - Fine-tune LLM (e.g., GPT-3, GPT-3.5) on question to SQL pairs dataset and then use it as backbone in SQL Agent -> this is to improve LLM's ability to convert natural question to valid and complex SQL quries
 - Experiment with different prompt template. Even thought langchain provides default prompt template, but it may not be optimal, we can try different prompts which can improve LLM ability in understanding user questions expressed in daily plan language. E.g., you can refer to [ChatGPT Prompt Engineering for Developers by Andrew Ng](https://www.deeplearning.ai/short-courses/chatgpt-prompt-engineering-for-developers/) (release earlier May 2023), https://www.awesomegptprompts.com/, https://github.com/f/awesome-chatgpt-prompts
+- Improve LLM's ability to re-try from failed execuation (e.g., when prompt is too long, it should make prompt more compact, when SQL query failed, it should search the internet (e.g, stackoverflow) to help with the debug if needed).
+- Increase SQL agent power by using more tools (e.g, google search, stackoverflow, quora, SQL official documentation website etc)
