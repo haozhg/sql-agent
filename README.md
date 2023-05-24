@@ -14,6 +14,8 @@ Here are the one-time set up steps needed to generate `fifa.db` (sqlite db file)
 - `pip install csv-to-sqlite` and `ls fifa.csv | csv-to-sqlite -o fifa.db`
 
 ### Start SQL Agent
+The SQL Agent relies on a LLM (in this case GPT-3 or GPT-3.5) to help planning the task, and generating SQL queries.
+
 ```
 # create venv
 python3 -m venv .venv
@@ -124,7 +126,7 @@ Action: query_checker_sql_db
 Action Input: "SELECT PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY age) FROM fifa"
 Observation: The query is not valid for SQLite as it does not support the PERCENTILE_CONT function.
 ```
-Even after I change LLM to `GPT-3.5`, the context length issue disappears (even though the max context length of `GPT-3.5` is same as `GPT-3`), I think somehow GPT-3.5 does a better job at generating more concise prompts and SQL commands. Still I found that it produces syntax errors in SQL queries.
+When I change the LLM to `GPT-3.5`, the context length issue disappears (even though the max context length of `GPT-3.5` is same as `GPT-3`), I think somehow GPT-3.5 does a better job at generating more concise prompts and SQL commands. However, I found that it produces syntax errors in SQL queries.
 
 Question: what's the mean and std of age in the fifa table?
 ```
@@ -155,8 +157,7 @@ Observation: [(25.210821768283175, 22.545737961734247)]
 Thought:I now know the final answer.
 Final Answer: The mean age in the `fifa` table is approximately 25.21 and the standard deviation is approximately 22.55.
 ```
-The first SQL query failed but the model was able to correct itself after re-try, which is amazing!
-
+The same question will produce context length limit error if using `GPT-3`, but after I change it to `GPT-3.5`, there is no context length error anymore. The first SQL query failed but the model was able to correct itself after re-try, which is amazing!
 
 ### Improve SQL Agent for Tables with Hundreds of Columns
 Challenges
