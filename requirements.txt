@@ -1,0 +1,4 @@
+openai
+langchain
+pandas
+csv-to-sqlite
